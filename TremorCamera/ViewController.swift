@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
+class ViewController: UIViewController {
     
     private let captureSession = AVCaptureSession()
 
@@ -53,35 +53,51 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     
     func setUpCaptureSession() {
         
-        // Setup camera input to captureSession:
+        captureSession.beginConfiguration()  // Must be called before beginning capture session configuration
         
-        captureSession.beginConfiguration()
+        // Setup camera input to captureSession:
         
         guard let videoDevice = AVCaptureDevice.default(.builtInTrueDepthCamera, for: .video, position: .front)
             else { return }  // Configuration failed, no true depth camera.
         
-        
         guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice)
-            else { return }  // Configuration failed, cannot use back camera as capture input device.
+            else { return }  // Configuration failed, cannot use camera as capture input device.
+        
+        do {
+            try videoDeviceInput.device.lockForConfiguration()
+        } catch { return }
+        
+        // Select an absolute depth (not disparity) format that works with the active color format:
+        // There are two available formats for absolute depth: hdep and fdep (16 or 32 bit float values)
+        let availableFormats = videoDevice.activeFormat.supportedDepthDataFormats
+        let depthFormat = availableFormats.filter { format in
+            let pixelFormatType =
+                CMFormatDescriptionGetMediaSubType(format.formatDescription)
+            
+            return (pixelFormatType == kCVPixelFormatType_DepthFloat16 ||
+                    pixelFormatType == kCVPixelFormatType_DepthFloat32)
+        }.first
+        videoDevice.activeDepthDataFormat = depthFormat
+        
+        videoDeviceInput.device.unlockForConfiguration()
         
         if captureSession.canAddInput(videoDeviceInput) {
             captureSession.addInput(videoDeviceInput)
         } else { return }  // Configuration failed, cannot add input to captureSession.
         
         
-        // Setup continuous video output from captureSession, used for camera preview:
+        // Set up photo output for depth data capture:
         
-        let videoDataOutput = AVCaptureVideoDataOutput()  // Continuous video data output
+        let photoOutput = AVCapturePhotoOutput()
         
-        if captureSession.canSetSessionPreset(.high) {
-            captureSession.sessionPreset = .high
-        } else { return }
+        // Enable depth data capture if depth data capture is supported by the camera:
+        photoOutput.isDepthDataDeliveryEnabled = photoOutput.isDepthDataDeliverySupported
         
-        videoDataOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "queue.serial.videoQueue"))
+        guard self.captureSession.canAddOutput(photoOutput)
+            else { fatalError("Can't add photo output.") }
+        self.captureSession.addOutput(photoOutput)
         
-        if captureSession.canAddOutput(videoDataOutput) {
-            captureSession.addOutput(videoDataOutput)
-        } else { return }
+        self.captureSession.sessionPreset = .photo
         
         
         // Setup preview for captureSession:
@@ -89,7 +105,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         cameraPreviewView.videoPreviewLayer.session = captureSession
         cameraPreviewView.videoPreviewLayer.videoGravity = .resizeAspect  // Set video preview to fit the view with no overflow
         
-        captureSession.commitConfiguration()
+        
+        captureSession.commitConfiguration()  // Must be called after completing capture session configuration, before committing
+        
         let serialQueue = DispatchQueue(label: "queue.serial.startCaptureSession")
         serialQueue.async {
             self.captureSession.startRunning()

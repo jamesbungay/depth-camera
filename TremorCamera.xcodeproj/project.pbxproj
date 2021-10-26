@@ -46,7 +46,6 @@
 			children = (
 				13416EDF2727026B00D1DDAD /* TremorCamera */,
 				13416EDE2727026B00D1DDAD /* Products */,
-				13416EF82728396900D1DDAD /* AppleLICENSE.txt */,
 			);
 			sourceTree = "<group>";
 		};
@@ -61,6 +60,7 @@
 		13416EDF2727026B00D1DDAD /* TremorCamera */ = {
 			isa = PBXGroup;
 			children = (
+				13416EF82728396900D1DDAD /* AppleLICENSE.txt */,
 				13416EE02727026B00D1DDAD /* AppDelegate.swift */,
 				13416EE22727026B00D1DDAD /* SceneDelegate.swift */,
 				13416EE42727026B00D1DDAD /* ViewController.swift */,
