@@ -13,10 +13,12 @@
 		13416EE82727026B00D1DDAD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13416EE62727026B00D1DDAD /* Main.storyboard */; };
 		13416EEA2727026C00D1DDAD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13416EE92727026C00D1DDAD /* Assets.xcassets */; };
 		13416EED2727026C00D1DDAD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13416EEB2727026C00D1DDAD /* LaunchScreen.storyboard */; };
+		13416EF52728321600D1DDAD /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13416EF42728321600D1DDAD /* CameraPreviewView.swift */; };
+		13416EF92728396900D1DDAD /* AppleLICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 13416EF82728396900D1DDAD /* AppleLICENSE.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		13416EDD2727026B00D1DDAD /* TremorCamera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TremorCamera.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13416EDD2727026B00D1DDAD /* Tremor Camera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tremor Camera.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13416EE02727026B00D1DDAD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		13416EE22727026B00D1DDAD /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		13416EE42727026B00D1DDAD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -24,6 +26,8 @@
 		13416EE92727026C00D1DDAD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		13416EEC2727026C00D1DDAD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		13416EEE2727026C00D1DDAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		13416EF42728321600D1DDAD /* CameraPreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		13416EF82728396900D1DDAD /* AppleLICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AppleLICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,13 +46,14 @@
 			children = (
 				13416EDF2727026B00D1DDAD /* TremorCamera */,
 				13416EDE2727026B00D1DDAD /* Products */,
+				13416EF82728396900D1DDAD /* AppleLICENSE.txt */,
 			);
 			sourceTree = "<group>";
 		};
 		13416EDE2727026B00D1DDAD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13416EDD2727026B00D1DDAD /* TremorCamera.app */,
+				13416EDD2727026B00D1DDAD /* Tremor Camera.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -59,6 +64,7 @@
 				13416EE02727026B00D1DDAD /* AppDelegate.swift */,
 				13416EE22727026B00D1DDAD /* SceneDelegate.swift */,
 				13416EE42727026B00D1DDAD /* ViewController.swift */,
+				13416EF42728321600D1DDAD /* CameraPreviewView.swift */,
 				13416EE62727026B00D1DDAD /* Main.storyboard */,
 				13416EE92727026C00D1DDAD /* Assets.xcassets */,
 				13416EEB2727026C00D1DDAD /* LaunchScreen.storyboard */,
@@ -84,7 +90,7 @@
 			);
 			name = TremorCamera;
 			productName = TremorCamera;
-			productReference = 13416EDD2727026B00D1DDAD /* TremorCamera.app */;
+			productReference = 13416EDD2727026B00D1DDAD /* Tremor Camera.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -126,6 +132,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13416EED2727026C00D1DDAD /* LaunchScreen.storyboard in Resources */,
+				13416EF92728396900D1DDAD /* AppleLICENSE.txt in Resources */,
 				13416EEA2727026C00D1DDAD /* Assets.xcassets in Resources */,
 				13416EE82727026B00D1DDAD /* Main.storyboard in Resources */,
 			);
@@ -138,6 +145,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				13416EF52728321600D1DDAD /* CameraPreviewView.swift in Sources */,
 				13416EE52727026B00D1DDAD /* ViewController.swift in Sources */,
 				13416EE12727026B00D1DDAD /* AppDelegate.swift in Sources */,
 				13416EE32727026B00D1DDAD /* SceneDelegate.swift in Sources */,
@@ -287,12 +295,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 296TCY3F27;
 				INFOPLIST_FILE = TremorCamera/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jamesbungay.TremorCamera;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Tremor Camera";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -305,12 +314,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 296TCY3F27;
 				INFOPLIST_FILE = TremorCamera/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jamesbungay.TremorCamera;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Tremor Camera";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
