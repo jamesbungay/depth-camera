@@ -76,9 +76,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		13416EDC2727026B00D1DDAD /* TremorCamera */ = {
+		13416EDC2727026B00D1DDAD /* Depth Camera */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13416EF12727026C00D1DDAD /* Build configuration list for PBXNativeTarget "TremorCamera" */;
+			buildConfigurationList = 13416EF12727026C00D1DDAD /* Build configuration list for PBXNativeTarget "Depth Camera" */;
 			buildPhases = (
 				13416ED92727026B00D1DDAD /* Sources */,
 				13416EDA2727026B00D1DDAD /* Frameworks */,
@@ -88,7 +88,7 @@
 			);
 			dependencies = (
 			);
-			name = TremorCamera;
+			name = "Depth Camera";
 			productName = TremorCamera;
 			productReference = 13416EDD2727026B00D1DDAD /* Tremor Camera.app */;
 			productType = "com.apple.product-type.application";
@@ -100,7 +100,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1150;
-				LastUpgradeCheck = 1150;
+				LastUpgradeCheck = 1320;
 				ORGANIZATIONNAME = "James Bungay";
 				TargetAttributes = {
 					13416EDC2727026B00D1DDAD = {
@@ -108,7 +108,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 13416ED82727026B00D1DDAD /* Build configuration list for PBXProject "TremorCamera" */;
+			buildConfigurationList = 13416ED82727026B00D1DDAD /* Build configuration list for PBXProject "Depth Camera" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -121,7 +121,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13416EDC2727026B00D1DDAD /* TremorCamera */,
+				13416EDC2727026B00D1DDAD /* Depth Camera */,
 			);
 		};
 /* End PBXProject section */
@@ -200,6 +200,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -260,6 +261,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -329,7 +331,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		13416ED82727026B00D1DDAD /* Build configuration list for PBXProject "TremorCamera" */ = {
+		13416ED82727026B00D1DDAD /* Build configuration list for PBXProject "Depth Camera" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13416EEF2727026C00D1DDAD /* Debug */,
@@ -338,7 +340,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		13416EF12727026C00D1DDAD /* Build configuration list for PBXNativeTarget "TremorCamera" */ = {
+		13416EF12727026C00D1DDAD /* Build configuration list for PBXNativeTarget "Depth Camera" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13416EF22727026C00D1DDAD /* Debug */,
