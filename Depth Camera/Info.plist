@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Depth Camera</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -21,7 +23,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera access is needed to measure hand tremor</string>
+	<string>Camera access is needed to measure depth</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photo library access is needed to save depth photos</string>
 	<key>UIApplicationSceneManifest</key>

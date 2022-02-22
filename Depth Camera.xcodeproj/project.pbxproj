@@ -44,7 +44,7 @@
 		13416ED42727026B00D1DDAD = {
 			isa = PBXGroup;
 			children = (
-				13416EDF2727026B00D1DDAD /* TremorCamera */,
+				13416EDF2727026B00D1DDAD /* Depth Camera */,
 				13416EDE2727026B00D1DDAD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -57,7 +57,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		13416EDF2727026B00D1DDAD /* TremorCamera */ = {
+		13416EDF2727026B00D1DDAD /* Depth Camera */ = {
 			isa = PBXGroup;
 			children = (
 				13416EF82728396900D1DDAD /* AppleLICENSE.txt */,
@@ -70,7 +70,7 @@
 				13416EEB2727026C00D1DDAD /* LaunchScreen.storyboard */,
 				13416EEE2727026C00D1DDAD /* Info.plist */,
 			);
-			path = TremorCamera;
+			path = "Depth Camera";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -296,13 +296,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 296TCY3F27;
-				INFOPLIST_FILE = TremorCamera/Info.plist;
+				INFOPLIST_FILE = "Depth Camera/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.jamesbungay.TremorCamera;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamesbungay.DepthCamera;
 				PRODUCT_NAME = "Tremor Camera";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -315,13 +315,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 296TCY3F27;
-				INFOPLIST_FILE = TremorCamera/Info.plist;
+				INFOPLIST_FILE = "Depth Camera/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.jamesbungay.TremorCamera;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamesbungay.DepthCamera;
 				PRODUCT_NAME = "Tremor Camera";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
