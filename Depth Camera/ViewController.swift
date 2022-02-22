@@ -39,6 +39,14 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
     private var waitingToShowDepth = false
     
     
+    private var depthMeasurementRepeats = 10
+    private var depthMeasurementsLeftInLoop = 0
+    private var depthMeasurementsCumul: Float32 = 0.0
+    private var depthMeasurementMin: Float32 = 0.0
+    private var depthMeasurementMax: Float32 = 0.0
+    private var depthMeasurementsString = ""
+    
+    
     // MARK: ViewController Lifecycle
     
     override func viewDidLoad() {
@@ -173,45 +181,78 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
     func depthDataOutput(_ output: AVCaptureDepthDataOutput, didOutput depthData: AVDepthData, timestamp: CMTime, connection: AVCaptureConnection) {
         
         if waitingToShowDepth {
-        let depthFrame = depthData.depthDataMap
-
-        let depthPoint = CGPoint(x: CGFloat(CVPixelBufferGetWidth(depthFrame)) / 2, y: CGFloat(CVPixelBufferGetHeight(depthFrame) / 2))
-        
-        print(depthPoint)
-        
-        
-//      MAGIC FUNCTION WHICH GETS DEPTH VALUE FROM POINT:
-        
-        assert(kCVPixelFormatType_DepthFloat16 == CVPixelBufferGetPixelFormatType(depthFrame))
-        CVPixelBufferLockBaseAddress(depthFrame, .readOnly)
-        let rowData = CVPixelBufferGetBaseAddress(depthFrame)! + Int(depthPoint.y) * CVPixelBufferGetBytesPerRow(depthFrame)
-        // swift does not have an Float16 data type. Use UInt16 instead, and then translate
-        var f16Pixel = rowData.assumingMemoryBound(to: UInt16.self)[Int(depthPoint.x)]
-        var f32Pixel = Float(0.0)
-
-        CVPixelBufferUnlockBaseAddress(depthFrame, .readOnly)
-        
-        withUnsafeMutablePointer(to: &f16Pixel) { f16RawPointer in
-            withUnsafeMutablePointer(to: &f32Pixel) { f32RawPointer in
-                var src = vImage_Buffer(data: f16RawPointer, height: 1, width: 1, rowBytes: 2)
-                var dst = vImage_Buffer(data: f32RawPointer, height: 1, width: 1, rowBytes: 4)
-                vImageConvert_Planar16FtoPlanarF(&src, &dst, 0)
+            
+            if depthMeasurementsLeftInLoop == 0 {
+                depthMeasurementsCumul = 0.0
+                depthMeasurementMin = 9999.9
+                depthMeasurementMax = 0.0
+                depthMeasurementsLeftInLoop = depthMeasurementRepeats
+                depthMeasurementsString = ""
             }
-        }
             
-//      END OF MAGIC FUNCTION.
-        
-            
-        // Convert the depth frame format to cm
-        let depthString = String(format: "%.2f cm", f32Pixel * 100)
+            if depthMeasurementsLeftInLoop > 0 {
+                let depthFrame = depthData.depthDataMap
 
-        print(depthString)
-        
-        DispatchQueue.main.async {
-            self.depthLabel.text = depthString
-        }
+                let depthPoint = CGPoint(x: CGFloat(CVPixelBufferGetWidth(depthFrame)) / 2, y: CGFloat(CVPixelBufferGetHeight(depthFrame) / 2))
+                
+//                print(depthPoint)
+                
+                
+        //      MAGIC FUNCTION WHICH GETS DEPTH VALUE FROM POINT:
+                
+                assert(kCVPixelFormatType_DepthFloat16 == CVPixelBufferGetPixelFormatType(depthFrame))
+                CVPixelBufferLockBaseAddress(depthFrame, .readOnly)
+                let rowData = CVPixelBufferGetBaseAddress(depthFrame)! + Int(depthPoint.y) * CVPixelBufferGetBytesPerRow(depthFrame)
+                // swift does not have an Float16 data type. Use UInt16 instead, and then translate
+                var f16Pixel = rowData.assumingMemoryBound(to: UInt16.self)[Int(depthPoint.x)]
+                var f32Pixel = Float(0.0)
+
+                CVPixelBufferUnlockBaseAddress(depthFrame, .readOnly)
+                
+                withUnsafeMutablePointer(to: &f16Pixel) { f16RawPointer in
+                    withUnsafeMutablePointer(to: &f32Pixel) { f32RawPointer in
+                        var src = vImage_Buffer(data: f16RawPointer, height: 1, width: 1, rowBytes: 2)
+                        var dst = vImage_Buffer(data: f32RawPointer, height: 1, width: 1, rowBytes: 4)
+                        vImageConvert_Planar16FtoPlanarF(&src, &dst, 0)
+                    }
+                }
+                    
+        //      END OF MAGIC FUNCTION.
+                
+                
+                let measurement = f32Pixel * 100
+                depthMeasurementsCumul += measurement
+                if measurement > depthMeasurementMax {
+                    depthMeasurementMax = measurement
+                }
+                if measurement < depthMeasurementMin {
+                    depthMeasurementMin = measurement
+                }
+                
+                depthMeasurementsLeftInLoop -= 1
+                
+                let printStr = String(format: "Measurement %d: %.2f cm",
+                    depthMeasurementRepeats - depthMeasurementsLeftInLoop, measurement)
+                print(printStr)
+                
+                depthMeasurementsString += String(format: "%.2f,", measurement)
+            }
             
-        waitingToShowDepth = false
+            if depthMeasurementsLeftInLoop == 0 {
+                depthMeasurementsCumul = depthMeasurementsCumul / Float(depthMeasurementRepeats)
+                
+                // Convert the depth frame format to cm
+                let depthString = String(format: "%.2f cm (range: %.2f cm - %.2f cm)", depthMeasurementsCumul, depthMeasurementMin, depthMeasurementMax)
+
+                print(depthString)
+                print(depthMeasurementsString)
+                
+                DispatchQueue.main.async {
+                    self.depthLabel.text = depthString
+                }
+                
+                waitingToShowDepth = false
+            }
         }
     }
     
