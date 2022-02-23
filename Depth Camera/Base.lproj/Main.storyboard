@@ -33,13 +33,17 @@
                                     <action selector="pressedCaptureButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="baf-Bf-smY"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vEd-0g-ckc">
-                                <rect key="frame" x="207" y="94" width="0.0" height="0.0"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vEd-0g-ckc">
+                                <rect key="frame" x="207" y="89" width="0.0" height="0.0"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="90T-pK-868">
+                                <rect key="frame" x="188.5" y="94" width="37" height="37"/>
+                                <color key="color" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </activityIndicatorView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="O" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IvO-98-qeJ">
                                 <rect key="frame" x="195.5" y="429.5" width="23.5" height="37"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="30"/>
@@ -54,13 +58,16 @@
                         <constraints>
                             <constraint firstItem="IvO-98-qeJ" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="CJe-ZD-mCi"/>
                             <constraint firstItem="vEd-0g-ckc" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Fq9-Zo-VHR"/>
+                            <constraint firstItem="90T-pK-868" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="MxN-sX-WK2"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="VA7-o4-u4y" secondAttribute="bottom" constant="50" id="POu-Bv-lyL"/>
                             <constraint firstItem="VA7-o4-u4y" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="cAX-Jg-uVy"/>
                             <constraint firstItem="IvO-98-qeJ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="e7X-tF-kQa"/>
-                            <constraint firstItem="vEd-0g-ckc" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="50" id="f6K-oQ-WP0"/>
+                            <constraint firstItem="vEd-0g-ckc" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="45" id="f6K-oQ-WP0"/>
+                            <constraint firstItem="90T-pK-868" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="50" id="sva-Me-QhV"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="90T-pK-868" id="zuY-Ek-nQh"/>
                         <outlet property="cameraPreviewView" destination="SOD-EH-5VP" id="LBH-Uz-jkU"/>
                         <outlet property="captureButton" destination="VA7-o4-u4y" id="Y58-5b-sCU"/>
                         <outlet property="depthLabel" destination="vEd-0g-ckc" id="Lxg-VF-YXg"/>

@@ -1,9 +1,9 @@
 //
 //  CameraPreviewView.swift
-//  CarbonCamera
+//  Depth Camera
 //
-//  Created by James Bungay on 24/07/2020.
-//  Copyright © 2020 James Bungay. All rights reserved.
+//  Created by James Bungay on 25/10/2021.
+//  Copyright © 2021 James Bungay. All rights reserved.
 //
 
 import UIKit

@@ -1,6 +1,6 @@
 //
 //  ViewController.swift
-//  TremorCamera
+//  Depth Camera
 //
 //  Created by James Bungay on 25/10/2021.
 //  Copyright © 2021 James Bungay. All rights reserved.
@@ -30,16 +30,19 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
                                                                                mediaType: .video,
                                                                                position: .front)
     
+    
     @IBOutlet weak var cameraPreviewView: CameraPreviewView!
     
     @IBOutlet weak var captureButton: UIButton!
     
     @IBOutlet weak var depthLabel: UILabel!
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
     private var waitingToShowDepth = false
     
     
-    private var depthMeasurementRepeats = 10
+    private let depthMeasurementRepeats = 10
     private var depthMeasurementsLeftInLoop = 0
     private var depthMeasurementsCumul: Float32 = 0.0
     private var depthMeasurementMin: Float32 = 0.0
@@ -58,19 +61,16 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
         }
         
         // Verify authorisation for video capture, and then set up captureSession:
-        
         if AVCaptureDevice.authorizationStatus(for: .video) == .authorized || AVCaptureDevice.authorizationStatus(for: .video) == .notDetermined {
-        }
-        
-        sessionQueue.async {
-            self.setUpCaptureSession()
+            sessionQueue.async {
+                self.setUpCaptureSession()
+            }
         }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         
         // If unauthorised for video capture, display an alert explaining why:
-        
         switch AVCaptureDevice.authorizationStatus(for: .video) {
             case .denied: // The user has previously denied access.
                 showAlert(title: "No camera access", msg: "Please allow camera access in settings for Tremor Camera to use this app.")
@@ -161,14 +161,13 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
             return
         }
         
-        captureSession.commitConfiguration()  // Must be called after completing capture session configuration, before committing
+        captureSession.commitConfiguration()  // Must be called after completing capture session configuration
 
         // Set up preview for captureSession:
-
-        cameraPreviewView.videoPreviewLayer.session = captureSession
-        cameraPreviewView.videoPreviewLayer.videoGravity = .resizeAspect  // Set video preview to fit the view with no overflow
-
-        
+        DispatchQueue.main.async {
+            self.cameraPreviewView.videoPreviewLayer.session = self.captureSession
+            self.cameraPreviewView.videoPreviewLayer.videoGravity = .resizeAspect  // Set video preview to fit the view with no overflow
+        }
 
         sessionQueue.async {
             self.captureSession.startRunning()
@@ -188,6 +187,11 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
                 depthMeasurementMax = 0.0
                 depthMeasurementsLeftInLoop = depthMeasurementRepeats
                 depthMeasurementsString = ""
+                
+                DispatchQueue.main.async {
+                    self.depthLabel.isHidden = true
+                    self.activityIndicator.isHidden = false
+                }
             }
             
             if depthMeasurementsLeftInLoop > 0 {
@@ -242,13 +246,15 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
                 depthMeasurementsCumul = depthMeasurementsCumul / Float(depthMeasurementRepeats)
                 
                 // Convert the depth frame format to cm
-                let depthString = String(format: "%.2f cm (range: %.2f cm - %.2f cm)", depthMeasurementsCumul, depthMeasurementMin, depthMeasurementMax)
+                let depthString = String(format: "Depth: %.2f cm\nRange across %d readings: %.2f cm - %.2f cm", depthMeasurementsCumul, depthMeasurementRepeats, depthMeasurementMin, depthMeasurementMax)
 
                 print(depthString)
                 print(depthMeasurementsString)
                 
                 DispatchQueue.main.async {
                     self.depthLabel.text = depthString
+                    self.depthLabel.isHidden = false
+                    self.activityIndicator.isHidden = true
                 }
                 
                 waitingToShowDepth = false
@@ -257,9 +263,7 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
     }
     
     
-    
-    
-    // MARK: Capture-button Click Handler
+    // MARK: Button Click Handler
     
     @IBAction func pressedCaptureButton(_ sender: Any) {
         waitingToShowDepth = true
@@ -308,4 +312,3 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
     }
 
 }
-
