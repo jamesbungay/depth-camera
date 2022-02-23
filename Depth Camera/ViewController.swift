@@ -8,27 +8,19 @@
 
 import UIKit
 import AVFoundation
-import Photos
 import Accelerate
 
 class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
     
     private let captureSession = AVCaptureSession()
     
-    private let photoOutput = AVCapturePhotoOutput()
     private let depthDataOutput = AVCaptureDepthDataOutput()
     
-    // Communicate with the session and other session objects on this queue.
-    private let sessionQueue = DispatchQueue(label: "session queue", attributes: [], autoreleaseFrequency: .workItem)
+    // Communicate with the session and other session objects on this queue:
+    private let sessionQueue = DispatchQueue(label: "capture session queue")
     
-    // Depth data handled on this synchronous queue.
-    private let dataOutputQueue = DispatchQueue(label: "video data queue", qos: .userInitiated, attributes: [], autoreleaseFrequency: .workItem)
-
-    private var videoDeviceInput: AVCaptureDeviceInput!
-    
-    private let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInTrueDepthCamera],
-                                                                               mediaType: .video,
-                                                                               position: .front)
+    // Depth data handled on this synchronous queue:
+    private let dataOutputQueue = DispatchQueue(label: "depth data queue", qos: .userInitiated)
     
     
     @IBOutlet weak var cameraPreviewView: CameraPreviewView!
@@ -39,9 +31,11 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
+    
+    // Indicates whether the button 'capture depth measurement' button has been pressed:
     private var waitingToShowDepth = false
     
-    
+    // Used for calculating the average of multiple (default 10) depth measurements:
     private let depthMeasurementRepeats = 10
     private var depthMeasurementsLeftInLoop = 0
     private var depthMeasurementsCumul: Float32 = 0.0
@@ -56,10 +50,6 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        if PHPhotoLibrary.authorizationStatus() == .notDetermined {
-            PHPhotoLibrary.requestAuthorization({_ in })
-        }
-        
         // Verify authorisation for video capture, and then set up captureSession:
         if AVCaptureDevice.authorizationStatus(for: .video) == .authorized || AVCaptureDevice.authorizationStatus(for: .video) == .notDetermined {
             sessionQueue.async {
@@ -73,7 +63,7 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
         // If unauthorised for video capture, display an alert explaining why:
         switch AVCaptureDevice.authorizationStatus(for: .video) {
             case .denied: // The user has previously denied access.
-                showAlert(title: "No camera access", msg: "Please allow camera access in settings for Tremor Camera to use this app.")
+                showAlert(title: "No camera access", msg: "Please allow camera access in settings to use this app.")
                 return
             case .restricted: // The user can't grant access due to restrictions.
                 showAlert(title: "No camera access", msg: "Your parental restrictions prevent you from using the camera. Camera access is needed to use this app.")
@@ -88,85 +78,72 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
     
     func setUpCaptureSession() {
         
-        print("ofijfoij")
-        
         // Setup camera input to captureSession:
-        let defaultVideoDevice: AVCaptureDevice? = videoDeviceDiscoverySession.devices.first
-        
-        guard let videoDevice = defaultVideoDevice else {
-            print("Could not find any video device")
-            return
-        }
-        
-        do {
-            videoDeviceInput = try AVCaptureDeviceInput(device: videoDevice)
-        } catch {
-            print("Could not create video device input: \(error)")
-            return
-        }
-//        guard let videoDevice = AVCaptureDevice.default(.builtInTrueDepthCamera, for: .video, position: .front)
-//            else { return }  // Configuration failed, no true depth camera.
-//
-//        guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice)
-//            else { return }  // Configuration failed, cannot use camera as capture input device.
-//
-        
+        guard let videoDevice = AVCaptureDevice.default(.builtInTrueDepthCamera, for: .video, position: .front)
+            else {
+                // Configuration failed, device has no true depth camera.
+                print("Device has no TrueDepth camera.")
+                return
+            }
+
+        guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice)
+            else {
+                // Configuration failed, cannot use camera as capture input device.
+                print("Could not use camera as input device for capture session.")
+                return
+            }
+
         captureSession.beginConfiguration()
         
-        self.captureSession.sessionPreset = AVCaptureSession.Preset.vga640x480
+        captureSession.sessionPreset = AVCaptureSession.Preset.vga640x480
         
         // Add video input:
         if captureSession.canAddInput(videoDeviceInput) {
             captureSession.addInput(videoDeviceInput)
-        } else { return }  // Configuration failed, cannot add input to captureSession.
-        
-        
-        // Add photo output:
-        guard self.captureSession.canAddOutput(photoOutput)
-            else { fatalError("Can't add photo output.") }
-        self.captureSession.addOutput(photoOutput)
-        
+        } else {
+            // Configuration failed, cannot add input to captureSession.
+            print("Could not use camera as input device for capture session.")
+            return
+        }
         
         // Add depth data output:
         if captureSession.canAddOutput(depthDataOutput) {
             captureSession.addOutput(depthDataOutput)
+            // Don't apply noise filtering to depth data:
             depthDataOutput.isFilteringEnabled = false
-            if let connection = depthDataOutput.connection(with: .depthData) {
-                connection.isEnabled = true
-            } else {
-                print("No AVCaptureConnection")
-            }
         } else {
-            print("Could not add depth data output to the session")
+            // Configuration failed, cannot add depth data output to captureSession.
+            print("Could not add depth data output to the capture session.")
             return
         }
         depthDataOutput.setDelegate(self, callbackQueue: dataOutputQueue)
         
-        
-        // Search for highest resolution with half-point depth values:
-        let depthFormats = videoDevice.activeFormat.supportedDepthDataFormats
-        let filtered = depthFormats.filter({
-            CMFormatDescriptionGetMediaSubType($0.formatDescription) == kCVPixelFormatType_DepthFloat16
-        })
-        let selectedFormat = filtered.max(by: {
+        // Search for highest resolution depth format with half-point depth values:
+        let availableFormats = videoDevice.activeFormat.supportedDepthDataFormats
+        let selectedFormat = availableFormats.filter { f in
+            CMFormatDescriptionGetMediaSubType(f.formatDescription) == kCVPixelFormatType_DepthFloat16
+        }.max(by: {
             first, second in CMVideoFormatDescriptionGetDimensions(first.formatDescription).width < CMVideoFormatDescriptionGetDimensions(second.formatDescription).width
         })
-        
+                
+        // Set depth data format to the one which was chosen above:
         do {
             try videoDevice.lockForConfiguration()
-            videoDevice.activeDepthDataFormat = selectedFormat
-            videoDevice.unlockForConfiguration()
         } catch {
-            print("Could not lock device for configuration: \(error)")
+            print("Could not lock camera for configuration.")
             return
         }
-        
-        captureSession.commitConfiguration()  // Must be called after completing capture session configuration
+        videoDevice.activeDepthDataFormat = selectedFormat
+        videoDevice.unlockForConfiguration()
+
+        // Must be called after completing capture session configuration:
+        captureSession.commitConfiguration()
 
         // Set up preview for captureSession:
         DispatchQueue.main.async {
             self.cameraPreviewView.videoPreviewLayer.session = self.captureSession
-            self.cameraPreviewView.videoPreviewLayer.videoGravity = .resizeAspect  // Set video preview to fit the view with no overflow
+            // Set video preview to fit the view with no overflow:
+            self.cameraPreviewView.videoPreviewLayer.videoGravity = .resizeAspect
         }
 
         sessionQueue.async {
@@ -175,7 +152,7 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
     }
 
     
-    // MARK: Depth data delegate
+    // MARK: Depth Data Delegate
     
     func depthDataOutput(_ output: AVCaptureDepthDataOutput, didOutput depthData: AVDepthData, timestamp: CMTime, connection: AVCaptureConnection) {
         
@@ -197,22 +174,19 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
             if depthMeasurementsLeftInLoop > 0 {
                 let depthFrame = depthData.depthDataMap
 
+                // Measure depth at the centre of the camera frame:
                 let depthPoint = CGPoint(x: CGFloat(CVPixelBufferGetWidth(depthFrame)) / 2, y: CGFloat(CVPixelBufferGetHeight(depthFrame) / 2))
                 
-//                print(depthPoint)
                 
-                
-        //      MAGIC FUNCTION WHICH GETS DEPTH VALUE FROM POINT:
-                
+                // Get the depth value from the point defined by 'depthPoint' from the frame of depth data 'depthFrame':
+                /// The code following this line is subject to the licence 'AppleLICENCE.txt':
                 assert(kCVPixelFormatType_DepthFloat16 == CVPixelBufferGetPixelFormatType(depthFrame))
                 CVPixelBufferLockBaseAddress(depthFrame, .readOnly)
                 let rowData = CVPixelBufferGetBaseAddress(depthFrame)! + Int(depthPoint.y) * CVPixelBufferGetBytesPerRow(depthFrame)
-                // swift does not have an Float16 data type. Use UInt16 instead, and then translate
+                // Swift does not have a Float16 data type. Use UInt16 instead, and then translate:
                 var f16Pixel = rowData.assumingMemoryBound(to: UInt16.self)[Int(depthPoint.x)]
                 var f32Pixel = Float(0.0)
-
                 CVPixelBufferUnlockBaseAddress(depthFrame, .readOnly)
-                
                 withUnsafeMutablePointer(to: &f16Pixel) { f16RawPointer in
                     withUnsafeMutablePointer(to: &f32Pixel) { f32RawPointer in
                         var src = vImage_Buffer(data: f16RawPointer, height: 1, width: 1, rowBytes: 2)
@@ -220,11 +194,11 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
                         vImageConvert_Planar16FtoPlanarF(&src, &dst, 0)
                     }
                 }
-                    
-        //      END OF MAGIC FUNCTION.
+                /// End of code which is subject to AppleLICENCE.
                 
-                
+                // Convert from depth frame format to cm:
                 let measurement = f32Pixel * 100
+                
                 depthMeasurementsCumul += measurement
                 if measurement > depthMeasurementMax {
                     depthMeasurementMax = measurement
@@ -245,7 +219,6 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
             if depthMeasurementsLeftInLoop == 0 {
                 depthMeasurementsCumul = depthMeasurementsCumul / Float(depthMeasurementRepeats)
                 
-                // Convert the depth frame format to cm
                 let depthString = String(format: "Depth: %.2f cm\nRange across %d readings: %.2f cm - %.2f cm", depthMeasurementsCumul, depthMeasurementRepeats, depthMeasurementMin, depthMeasurementMax)
 
                 print(depthString)
@@ -271,8 +244,8 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
     
     
     // MARK: Thermal State Monitoring
-    // The code in this marked section is subject to the licence 'AppleLICENCE.txt'. Modifications have been made.
     
+    /// The code following this line is subject to the licence 'AppleLICENCE.txt'. Modifications have been made.
     @objc
     func thermalStateChanged(notification: NSNotification) {
         
@@ -299,6 +272,7 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
             self.showAlert(title: "Thermal State Monitoring", msg: message)
         }
     }
+    /// End of code which is subject to AppleLICENCE.
     
     
     // MARK: Alert Function

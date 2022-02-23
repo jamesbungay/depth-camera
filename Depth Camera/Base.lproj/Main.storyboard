@@ -44,24 +44,20 @@
                                 <rect key="frame" x="188.5" y="94" width="37" height="37"/>
                                 <color key="color" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </activityIndicatorView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="O" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IvO-98-qeJ">
-                                <rect key="frame" x="195.5" y="429.5" width="23.5" height="37"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                                <color key="shadowColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <size key="shadowOffset" width="1" height="1"/>
-                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="circle.dashed" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="t3R-sO-xD9">
+                                <rect key="frame" x="197" y="438.5" width="20" height="19"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="IvO-98-qeJ" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="CJe-ZD-mCi"/>
+                            <constraint firstItem="t3R-sO-xD9" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="ABx-Ey-CE7"/>
                             <constraint firstItem="vEd-0g-ckc" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Fq9-Zo-VHR"/>
+                            <constraint firstItem="t3R-sO-xD9" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Gla-qe-xLL"/>
                             <constraint firstItem="90T-pK-868" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="MxN-sX-WK2"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="VA7-o4-u4y" secondAttribute="bottom" constant="50" id="POu-Bv-lyL"/>
                             <constraint firstItem="VA7-o4-u4y" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="cAX-Jg-uVy"/>
-                            <constraint firstItem="IvO-98-qeJ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="e7X-tF-kQa"/>
                             <constraint firstItem="vEd-0g-ckc" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="45" id="f6K-oQ-WP0"/>
                             <constraint firstItem="90T-pK-868" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="50" id="sva-Me-QhV"/>
                         </constraints>
@@ -79,6 +75,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="circle.dashed" catalog="system" width="128" height="121"/>
         <systemColor name="darkTextColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
