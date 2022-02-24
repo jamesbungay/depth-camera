@@ -56,6 +56,9 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
                 self.setUpCaptureSession()
             }
         }
+        
+        // Make capture button's corners rounded:
+        captureButton.layer.cornerRadius = 10
     }
     
     override func viewDidAppear(_ animated: Bool) {
