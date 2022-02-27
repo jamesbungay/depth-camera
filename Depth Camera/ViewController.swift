@@ -123,10 +123,13 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
         
         // Search for highest resolution depth format with half-point depth values:
         let availableFormats = videoDevice.activeFormat.supportedDepthDataFormats
-        let selectedFormat = availableFormats.filter { f in
+        // n.b. hdep = half-point depth formats:
+        let availableHdepFormats = availableFormats.filter { f in
             CMFormatDescriptionGetMediaSubType(f.formatDescription) == kCVPixelFormatType_DepthFloat16
-        }.max(by: {
-            first, second in CMVideoFormatDescriptionGetDimensions(first.formatDescription).width < CMVideoFormatDescriptionGetDimensions(second.formatDescription).width
+        }
+        // Pick highest resolution of depth available:
+        let selectedFormat = availableHdepFormats.max(by: {
+            lower, higher in CMVideoFormatDescriptionGetDimensions(lower.formatDescription).width < CMVideoFormatDescriptionGetDimensions(higher.formatDescription).width
         })
                 
         // Set depth data format to the one which was chosen above:
@@ -180,27 +183,11 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
                 // Measure depth at the centre of the camera frame:
                 let depthPoint = CGPoint(x: CGFloat(CVPixelBufferGetWidth(depthFrame)) / 2, y: CGFloat(CVPixelBufferGetHeight(depthFrame) / 2))
                 
-                
-                // Get the depth value from the point defined by 'depthPoint' from the frame of depth data 'depthFrame':
-                /// The code following this line is subject to the licence 'AppleLICENCE.txt':
-                assert(kCVPixelFormatType_DepthFloat16 == CVPixelBufferGetPixelFormatType(depthFrame))
-                CVPixelBufferLockBaseAddress(depthFrame, .readOnly)
-                let rowData = CVPixelBufferGetBaseAddress(depthFrame)! + Int(depthPoint.y) * CVPixelBufferGetBytesPerRow(depthFrame)
-                // Swift does not have a Float16 data type. Use UInt16 instead, and then translate:
-                var f16Pixel = rowData.assumingMemoryBound(to: UInt16.self)[Int(depthPoint.x)]
-                var f32Pixel = Float(0.0)
-                CVPixelBufferUnlockBaseAddress(depthFrame, .readOnly)
-                withUnsafeMutablePointer(to: &f16Pixel) { f16RawPointer in
-                    withUnsafeMutablePointer(to: &f32Pixel) { f32RawPointer in
-                        var src = vImage_Buffer(data: f16RawPointer, height: 1, width: 1, rowBytes: 2)
-                        var dst = vImage_Buffer(data: f32RawPointer, height: 1, width: 1, rowBytes: 4)
-                        vImageConvert_Planar16FtoPlanarF(&src, &dst, 0)
-                    }
-                }
-                /// End of code which is subject to AppleLICENCE.
+                // Get the depth value from the coordinate defined by 'depthPoint' from the frame of depth data 'depthFrame':
+                let depthVal = getDepthValueFromFrame(fromFrame: depthFrame, atPoint: depthPoint)
                 
                 // Convert from depth frame format to cm:
-                let measurement = f32Pixel * 100
+                let measurement = depthVal * 100
                 
                 depthMeasurementsCumul += measurement
                 if measurement > depthMeasurementMax {
@@ -236,6 +223,28 @@ class ViewController: UIViewController, AVCaptureDepthDataOutputDelegate {
                 waitingToShowDepth = false
             }
         }
+    }
+    
+    // Function containing Apple code which extracts a depth value from a depth frame at a given point/coordinate:
+    func getDepthValueFromFrame(fromFrame: CVPixelBuffer, atPoint: CGPoint) -> Float {
+        
+        /// The code following this line is subject to the licence 'AppleLICENCE.txt':
+        assert(kCVPixelFormatType_DepthFloat16 == CVPixelBufferGetPixelFormatType(fromFrame))
+        CVPixelBufferLockBaseAddress(fromFrame, .readOnly)
+        let rowData = CVPixelBufferGetBaseAddress(fromFrame)! + Int(atPoint.y) * CVPixelBufferGetBytesPerRow(fromFrame)
+        // Swift does not have a Float16 data type. Use UInt16 instead, and then translate:
+        var f16Pixel = rowData.assumingMemoryBound(to: UInt16.self)[Int(atPoint.x)]
+        var f32Pixel = Float(0.0)
+        CVPixelBufferUnlockBaseAddress(fromFrame, .readOnly)
+        withUnsafeMutablePointer(to: &f16Pixel) { f16RawPointer in
+            withUnsafeMutablePointer(to: &f32Pixel) { f32RawPointer in
+                var src = vImage_Buffer(data: f16RawPointer, height: 1, width: 1, rowBytes: 2)
+                var dst = vImage_Buffer(data: f32RawPointer, height: 1, width: 1, rowBytes: 4)
+                vImageConvert_Planar16FtoPlanarF(&src, &dst, 0)
+            }
+        }
+        /// End of code which is subject to AppleLICENCE.
+        return f32Pixel
     }
     
     
